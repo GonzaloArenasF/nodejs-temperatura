@@ -27,10 +27,10 @@ app.get( '/temperatura', (req, res, next) => {
 
       clearInterval(si);
 
-      if ( listado.estado ) {
+      if ( listado.estado === true ) {
         var resTemperatura = jsonRes.set(true, listado.mensaje, listado.detalle);
         res.status( 400 ).json(resTemperatura);
-      } else if ( !listado.estado ){
+      } else if ( listado.estado === false ){
         var resTemperatura = jsonRes.set(false, listado.mensaje, listado.detalle);
         res.status( 500 ).json(resTemperatura);
       }
