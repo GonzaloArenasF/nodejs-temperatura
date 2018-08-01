@@ -22,16 +22,17 @@ var temperatura = {
 
   // Estado de la obtención de temeperaturas
   estado : null,
+  error  : null,
 
   // Listado de temperaturas obtenidas
-  places : {
-    cl:   { nombre: 'Santiago', abreviado: 'CL',  clima: null, latLon: '-33.4372,-70.6506' },
-    ch:   { nombre: 'Zurich',   abreviado: 'CH',  clima: null, latLon: '47.3666687,8.5500002' },
-    nz:   { nombre: 'Auckland', abreviado: 'NZ',  clima: null, latLon: '-36.8404,174.7634888' },
-    au:   { nombre: 'Sydney',   abreviado: 'AU',  clima: null, latLon: '-33.8667,151.2' },
-    uk:   { nombre: 'Londres',  abreviado: 'UK',  clima: null, latLon: '51.5072,-0.1275' },
-    usa:  { nombre: 'Georgia',  abreviado: 'USA', clima: null, latLon: '41.8036499,43.4819412' }
-  }
+  places : [
+    { nombre: 'Santiago', abreviado: 'CL',  clima: null, latLon: '-33.4372,-70.6506' },
+    { nombre: 'Zurich',   abreviado: 'CH',  clima: null, latLon: '47.3666687,8.5500002' },
+    { nombre: 'Auckland', abreviado: 'NZ',  clima: null, latLon: '-36.8404,174.7634888' },
+    { nombre: 'Sydney',   abreviado: 'AU',  clima: null, latLon: '-33.8667,151.2' },
+    { nombre: 'Londres',  abreviado: 'UK',  clima: null, latLon: '51.5072,-0.1275' },
+    { nombre: 'Georgia',  abreviado: 'USA', clima: null, latLon: '41.8036499,43.4819412' }
+  ]
 
 };
 
@@ -40,64 +41,45 @@ var temperatura = {
  */
 temperatura.getTemperaturas = () => {
 
-  temperatura.estado = null // Inicio del estado de control de la respuesta
+  temperatura.estado = null; // Inicio del estado de control de la respuesta
+  temperatura.error  = null; // Reinicio del mensaje de error
 
   axios.all([
 
-    axios.get(temperatura.servicio.url + '/' + temperatura.places.cl.latLon + '?' + temperatura.servicio.params)
-  //   axios.get(temperatura.servicio.url + '/' + temperatura.places.ch.latLon + '?' + temperatura.servicio.params),
-  //   axios.get(temperatura.servicio.url + '/' + temperatura.places.nz.latLon + '?' + temperatura.servicio.params),
-  //   axios.get(temperatura.servicio.url + '/' + temperatura.places.au.latLon + '?' + temperatura.servicio.params),
-  //   axios.get(temperatura.servicio.url + '/' + temperatura.places.uk.latLon + '?' + temperatura.servicio.params),
-  //   axios.get(temperatura.servicio.url + '/' + temperatura.places.usa.latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[0].latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[1].latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[2].latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[3].latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[4].latLon + '?' + temperatura.servicio.params),
+    axios.get(temperatura.servicio.url + '/' + temperatura.places[5].latLon + '?' + temperatura.servicio.params),
 
   ]).then(axios.spread((resCl, resCh, resNz, resAu, resUk, resUsa) => {
 
-    temperatura.places.cl.clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary };
-    // temperatura.places.ch.clima   = { temperatura: resCh.currently.temperature, estado: resCh.currently.summary };
-    // temperatura.places.nz.clima   = { temperatura: resNz.currently.temperature, estado: resNz.currently.summary };
-    // temperatura.places.au.clima   = { temperatura: resAu.currently.temperature, estado: resAu.currently.summary };
-    // temperatura.places.uk.clima   = { temperatura: resUk.currently.temperature, estado: resUk.currently.summary };
-    // temperatura.places.usa.clima  = { temperatura: resUsa.currently.temperature, estado: resUsa.currently.summary };
+    temperatura.places[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary };
+    temperatura.places[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary };
+    temperatura.places[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary };
+    temperatura.places[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary };
+    temperatura.places[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary };
+    temperatura.places[5].clima  = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary };
   
     temperatura.estado = true;
 
   })).catch(error => {
-    console.log('error', error);
+
+    console.error('temperatura.getTemperaturas', error);
     temperatura.estado = false;
+    temperatura.error  = error;
+    
   });
 
 }
 
 /**
- * Rescate de todas las temperaturas
- * @returns jsonRes => array(model)
+ * Coordina el rescate de todas las temperaturas
  */
 temperatura.getAll = () => {
   
-  try {
-
-    temperatura.getTemperaturas();
-
-    let si = setInterval( () => {
-
-      if (temperatura.estado !== null) {
-
-        clearInterval(si);
-
-        if (temperatura.estado === true) {
-          return jsonRes.set(true, 'Datos encontrados', temperatura.places);
-        } else if (temperatura.estado === false) {
-          throw 'No se pudo recuperar la información';
-        }
-
-      }
-
-    }, 500 );
-
-  } catch (e) {
-    return jsonRes.set(false, e.message);
-  }
+  temperatura.getTemperaturas();
 
 };
 

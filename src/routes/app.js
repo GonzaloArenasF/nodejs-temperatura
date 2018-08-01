@@ -20,20 +20,21 @@ var app = express();
 //
 app.get( '/temperatura', (req, res, next) => {
 
-  var listado = temperatura.getAll();
-  var si      = setInterval ( () => {
+  temperatura.getAll();
 
-    if ( typeof(listado) !== 'undefined' ) {
+  var si  = setInterval ( () => {
+    if ( temperatura.estado !== null ) {
 
       clearInterval(si);
 
-      if ( listado.estado === true ) {
-        var resTemperatura = jsonRes.set(true, listado.mensaje, listado.detalle);
+      if ( temperatura.estado  === true ) {
+        var resTemperatura = jsonRes.set(true, 'Datos encontrados', temperatura.places);
         res.status( 400 ).json(resTemperatura);
-      } else if ( listado.estado === false ){
-        var resTemperatura = jsonRes.set(false, listado.mensaje, listado.detalle);
+      } else if ( temperatura.estado === false ){
+        var resTemperatura = jsonRes.set(false, 'No se pudieron obtener datos', temperatura.error);
         res.status( 500 ).json(resTemperatura);
       }
+
     }
 
   }, 500);
