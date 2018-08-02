@@ -55,12 +55,12 @@ temperatura.getTemperaturas = () => {
 
   ]).then(axios.spread((resCl, resCh, resNz, resAu, resUk, resUsa) => {
 
-    temperatura.places[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary };
-    temperatura.places[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary };
-    temperatura.places[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary };
-    temperatura.places[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary };
-    temperatura.places[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary };
-    temperatura.places[5].clima  = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary };
+    temperatura.places[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary, icon: resCl.data.currently.icon };
+    temperatura.places[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary, icon: resCh.data.currently.icon  };
+    temperatura.places[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary, icon: resNz.data.currently.icon  };
+    temperatura.places[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary, icon: resAu.data.currently.icon  };
+    temperatura.places[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
+    temperatura.places[5].clima  = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
   
     temperatura.estado = true;
 
