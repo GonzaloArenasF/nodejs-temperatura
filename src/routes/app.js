@@ -29,7 +29,7 @@ app.get( '/temperatura', (req, res, next) => {
 
       if ( temperatura.estado  === true ) {
         var resTemperatura = jsonRes.set(true, 'Datos encontrados', temperatura.places);
-        res.status( 400 ).json(resTemperatura);
+        res.status( 200 ).json(resTemperatura);
       } else if ( temperatura.estado === false ){
         var resTemperatura = jsonRes.set(false, 'No se pudieron obtener datos', temperatura.error);
         res.status( 500 ).json(resTemperatura);
