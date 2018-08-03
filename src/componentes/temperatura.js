@@ -6,9 +6,24 @@
  * Definición de procesos para redes sociales
  * 
  */
-var https   = require('https');
 var jsonRes = require('../json-res');
 var axios   = require('axios');
+var redis   = require('redis');
+
+// Inicialización de variables
+var redisPort    = 6379;
+var redisHost    = '127.0.0.1';
+var redisClient  = redis.createClient(redisPort, redisHost);
+
+//
+// Conexión a Redis
+//
+redisClient.on('connect', () => {
+  console.log('Cliente Redis conectado a ' + redisHost + ':' + redisPort); 
+});
+redisClient.on('error', (err) => {
+  console.log(err);
+});
 
 /**
  * Componente principal
@@ -37,9 +52,9 @@ var temperatura = {
 };
 
 /**
- * Retorna la información de los lugares desde el servicio
+ * Retorna la información de los lugares desde el servicio y lo almacena en Redis
  */
-temperatura.getTemperaturas = () => {
+temperatura.getDataFromService = () => {
 
   temperatura.estado = null; // Inicio del estado de control de la respuesta
   temperatura.error  = null; // Reinicio del mensaje de error
@@ -62,6 +77,10 @@ temperatura.getTemperaturas = () => {
     temperatura.places[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
     temperatura.places[5].clima  = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
   
+    // Guardado en Redis
+    redisClient.set('places', JSON.stringify(temperatura.places), redis.print);
+
+    // Bandera de infromación capturada con éxito
     temperatura.estado = true;
 
   })).catch(error => {
@@ -77,9 +96,16 @@ temperatura.getTemperaturas = () => {
 /**
  * Coordina el rescate de todas las temperaturas
  */
-temperatura.getAll = () => {
-  
-  temperatura.getTemperaturas();
+temperatura.getDataFromRedis = () => {
+
+  redisClient.get('places', function (error, result) {
+    if (error) {
+      console.log(error);
+      return jsonRes.set(false, 'No se pudo obtener la data de Redis', error);
+    }
+    console.log('result', result);
+    return jsonRes.set(true, 'Data desde Redis', result);
+  });
 
 };
 

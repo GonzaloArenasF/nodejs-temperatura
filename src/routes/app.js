@@ -20,7 +20,9 @@ var app = express();
 //
 app.get( '/temperatura', (req, res, next) => {
 
-  temperatura.getAll();
+  temperatura.getDataFromService();
+  
+  let places = temperatura.getDataFromRedis();
 
   var si  = setInterval ( () => {
     if ( temperatura.estado !== null ) {
@@ -28,11 +30,17 @@ app.get( '/temperatura', (req, res, next) => {
       clearInterval(si);
 
       if ( temperatura.estado  === true ) {
-        var resTemperatura = jsonRes.set(true, 'Datos encontrados', temperatura.places);
-        res.status( 200 ).json(resTemperatura);
-      } else if ( temperatura.estado === false ){
-        var resTemperatura = jsonRes.set(false, 'No se pudieron obtener datos', temperatura.error);
-        res.status( 500 ).json(resTemperatura);
+
+        
+        console.log(places);
+        if (places.estado === true) {
+          res.status( 200 ).json( jsonRes.set(true, 'Datos encontrados', places.detalle) );
+        } else if (places.estado === false) {
+          res.status( 400 ).json( jsonRes.set(false, places.mensaje, places.detalle) );
+        }
+
+      } else if ( temperatura.estado === false ) {
+        res.status( 500 ).json( jsonRes.set(false, 'No se pudieron obtener datos', temperatura.error) );
       }
 
     }

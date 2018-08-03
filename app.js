@@ -20,7 +20,7 @@ var app                 = express();
 var server              = http.createServer(app);
 var io                  = socketIO(server);
 
-var temperatura = require('./src/componentes/temperatura');
+// var temperatura = require('./src/componentes/temperatura');
 
 //
 // Control CORS
@@ -42,7 +42,7 @@ var routesPath = './src/routes';
 app.use('/', require(routesPath + '/app'));
 
 // Sockets
-io.on('connection', function(socket) {
+/* io.on('connection', function(socket) {
 
   console.log('Una conexión estabecida', socket.id);
 
@@ -59,7 +59,7 @@ io.on('connection', function(socket) {
     
   });
 
-});
+});*/
 
 // Inicio de servidor
 server.listen( puertoServer, () => {
