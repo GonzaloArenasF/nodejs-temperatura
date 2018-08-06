@@ -130,12 +130,12 @@ oTemperatura.getDataFromDummy = () => {
     //
     // Dummy
     //
-    oTemperatura.lugares[0].clima   = { temperatura: 21, estado: 'Despejado', icon: 'clear-day' };
-    oTemperatura.lugares[1].clima   = { temperatura: 20, estado: 'Nublado', icon: 'cloudy'  };
-    oTemperatura.lugares[2].clima   = { temperatura: 22, estado: 'Nubosidad Parcial', icon: 'partly-cloudy-day'  };
-    oTemperatura.lugares[3].clima   = { temperatura: 19, estado: 'Lluvia', icon: 'rain'  };
-    oTemperatura.lugares[4].clima   = { temperatura: 23, estado: 'Ventisca', icon: 'wind'  };
-    oTemperatura.lugares[5].clima   = { temperatura: 18, estado: 'Tormenta', icon: 'thunderstorm'  };
+    oTemperatura.lugares[0].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Despejado', icon: 'clear-day' };
+    oTemperatura.lugares[1].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Nublado', icon: 'cloudy'  };
+    oTemperatura.lugares[2].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Nubosidad Parcial', icon: 'partly-cloudy-day'  };
+    oTemperatura.lugares[3].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Lluvia', icon: 'rain'  };
+    oTemperatura.lugares[4].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Ventisca', icon: 'wind'  };
+    oTemperatura.lugares[5].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2) , estado: 'Tormenta', icon: 'thunderstorm'  };
 
     oTemperatura.estadoConsumoServicio = true;
 
