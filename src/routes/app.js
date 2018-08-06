@@ -25,7 +25,8 @@ var app = express();
 //
 app.get( '/temperatura', (req, res, next) => {
 
-  oTemperatura.getDataFromService();
+  // oTemperatura.getDataFromService();
+  oTemperatura.getDataFromDummy();
 
   let si = setInterval( () => {
 
@@ -42,7 +43,7 @@ app.get( '/temperatura', (req, res, next) => {
       } else if (oTemperatura.estadoConsumoServicio === false) {
 
         res.status(500).json(
-          jsonRes.get(false, 'No se pudo rescatar la data', oTemperatura.errorConsumoServicio)
+          jsonRes.get(false, oTemperatura.errorConsumoServicio)
         );
 
       }

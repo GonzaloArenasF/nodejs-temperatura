@@ -58,47 +58,94 @@ oRedis.cliente.get( oLugares.redisKey, (error, result) => {
  */
 oTemperatura.getDataFromService = () => {
 
-  // Fallo del 10%
-  if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
+  try {
 
-  // Verificación de la obtención de los datos desde Redis
-  if (oTemperatura.estadoLugares === false ) { throw oTemperatura.errorLugares; }
+    // Fallo del 10%
+    if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
 
-  // Reinicio de valores de validación
-  oTemperatura.estadoConsumoServicio = null;
-  oTemperatura.errorConsumoServicio  = null;
+    // Verificación de la obtención de los datos desde Redis
+    if (oTemperatura.estadoLugares === false ) { throw oTemperatura.errorLugares; }
 
-  //
-  // Consumo del servicio con Axios
-  //
-  axios.all([
+    // Reinicio de valores de validación
+    oTemperatura.estadoConsumoServicio = null;
+    oTemperatura.errorConsumoServicio  = null;
 
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[0].latLon + '?' + oTemperatura.servicio.params),
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[1].latLon + '?' + oTemperatura.servicio.params),
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[2].latLon + '?' + oTemperatura.servicio.params),
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[3].latLon + '?' + oTemperatura.servicio.params),
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[4].latLon + '?' + oTemperatura.servicio.params),
-    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[5].latLon + '?' + oTemperatura.servicio.params),
+    //
+    // Consumo del servicio con Axios
+    //
+    axios.all([
 
-  ]).then(axios.spread((resCl, resCh, resNz, resAu, resUk, resUsa) => {
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[0].latLon + '?' + oTemperatura.servicio.params),
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[1].latLon + '?' + oTemperatura.servicio.params),
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[2].latLon + '?' + oTemperatura.servicio.params),
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[3].latLon + '?' + oTemperatura.servicio.params),
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[4].latLon + '?' + oTemperatura.servicio.params),
+      axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[5].latLon + '?' + oTemperatura.servicio.params),
 
-    oTemperatura.lugares[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary, icon: resCl.data.currently.icon };
-    oTemperatura.lugares[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary, icon: resCh.data.currently.icon  };
-    oTemperatura.lugares[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary, icon: resNz.data.currently.icon  };
-    oTemperatura.lugares[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary, icon: resAu.data.currently.icon  };
-    oTemperatura.lugares[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
-    oTemperatura.lugares[5].clima   = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
+    ]).then(axios.spread((resCl, resCh, resNz, resAu, resUk, resUsa) => {
 
-    // Bandera de infromación capturada con éxito
-    oTemperatura.estadoConsumoServicio = true;
+      oTemperatura.lugares[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary, icon: resCl.data.currently.icon };
+      oTemperatura.lugares[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary, icon: resCh.data.currently.icon  };
+      oTemperatura.lugares[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary, icon: resNz.data.currently.icon  };
+      oTemperatura.lugares[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary, icon: resAu.data.currently.icon  };
+      oTemperatura.lugares[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
+      oTemperatura.lugares[5].clima   = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
 
-  })).catch( error => {
+      // Bandera de infromación capturada con éxito
+      oTemperatura.estadoConsumoServicio = true;
+
+    })).catch( error => {
+
+      oTemperatura.errorConsumoServicio  = error;
+      oTemperatura.estadoConsumoServicio = false;
+      
+    });
+
+  } catch (e) {
 
     oTemperatura.errorConsumoServicio  = error;
     oTemperatura.estadoConsumoServicio = false;
-    
-  });
 
-}
+  }
+
+};
+
+/**
+ * Retorna la información de los lugares desde el servicio y lo almacena en Redis
+ */
+oTemperatura.getDataFromDummy = () => {
+
+  try {
+
+    // Fallo del 10%
+    if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
+
+    // Verificación de la obtención de los datos desde Redis
+    if (oTemperatura.estadoLugares === false ) { throw oTemperatura.errorLugares; }
+
+    // Reinicio de valores de validación
+    oTemperatura.estadoConsumoServicio = null;
+    oTemperatura.errorConsumoServicio  = null;
+
+    //
+    // Dummy
+    //
+    oTemperatura.lugares[0].clima   = { temperatura: 21, estado: 'Despejado', icon: 'clear-day' };
+    oTemperatura.lugares[1].clima   = { temperatura: 20, estado: 'Nublado', icon: 'cloudy'  };
+    oTemperatura.lugares[2].clima   = { temperatura: 22, estado: 'Nubosidad Parcial', icon: 'partly-cloudy-day'  };
+    oTemperatura.lugares[3].clima   = { temperatura: 19, estado: 'Lluvia', icon: 'rain'  };
+    oTemperatura.lugares[4].clima   = { temperatura: 23, estado: 'Ventisca', icon: 'wind'  };
+    oTemperatura.lugares[5].clima   = { temperatura: 18, estado: 'Tormenta', icon: 'thunderstorm'  };
+
+    oTemperatura.estadoConsumoServicio = true;
+
+  } catch (e) {
+
+    oTemperatura.errorConsumoServicio  = e;
+    oTemperatura.estadoConsumoServicio = false;
+
+  }
+
+};
 
 module.exports = oTemperatura;
