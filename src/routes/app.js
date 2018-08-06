@@ -1,17 +1,22 @@
 /**
  * @author Gonzalo A. Arenas Flores <gonzalo.arenas.flores@gmail.com>
  * @since 25-07-2018
- * @version 2018.0.1
+ * @version 2018.0.2
  * 
  * Definición de rutas únicas
  * 
  * // Consideraciones:
  * - JSON format standar require('../json-res');
  * 
+ * @author Gonzalo A. Arenas Flores <gonzalo.arenas.flores@gmail.com>
+ * @since 06-08-2018
+ * @version 2018.0.2
+ * - Refactoring
+ * 
  */
 var express = require('express');
 var jsonRes = require('../json-res');
-var temperatura = require('../componentes/temperatura');
+var oTemperatura = require('../componentes/temperatura');
 
 var app = express();
 
@@ -20,32 +25,32 @@ var app = express();
 //
 app.get( '/temperatura', (req, res, next) => {
 
-  temperatura.getDataFromService();
-  
-  let places = temperatura.getDataFromRedis();
+  oTemperatura.getDataFromService();
 
-  var si  = setInterval ( () => {
-    if ( temperatura.estado !== null ) {
+  let si = setInterval( () => {
+
+    if (oTemperatura.estadoConsumoServicio !== null) {
 
       clearInterval(si);
 
-      if ( temperatura.estado  === true ) {
+      if (oTemperatura.estadoConsumoServicio === true) {
 
-        
-        console.log(places);
-        if (places.estado === true) {
-          res.status( 200 ).json( jsonRes.set(true, 'Datos encontrados', places.detalle) );
-        } else if (places.estado === false) {
-          res.status( 400 ).json( jsonRes.set(false, places.mensaje, places.detalle) );
-        }
+        res.status(200).json(
+          jsonRes.get(true, 'Lugares rescatados', oTemperatura.lugares)
+        );
 
-      } else if ( temperatura.estado === false ) {
-        res.status( 500 ).json( jsonRes.set(false, 'No se pudieron obtener datos', temperatura.error) );
+      } else if (oTemperatura.estadoConsumoServicio === false) {
+
+        res.status(500).json(
+          jsonRes.get(false, 'No se pudo rescatar la data', oTemperatura.errorConsumoServicio)
+        );
+
       }
 
     }
 
-  }, 500);
+  }, 500 );
+
 
 });
 

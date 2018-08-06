@@ -6,29 +6,20 @@
  * Definición de procesos para redes sociales
  * 
  */
-var jsonRes = require('../json-res');
+
+//
+// Importaciones
+//
 var axios   = require('axios');
-var redis   = require('redis');
 
-// Inicialización de variables
-var redisPort    = 6379;
-var redisHost    = '127.0.0.1';
-var redisClient  = redis.createClient(redisPort, redisHost);
-
-//
-// Conexión a Redis
-//
-redisClient.on('connect', () => {
-  console.log('Cliente Redis conectado a ' + redisHost + ':' + redisPort); 
-});
-redisClient.on('error', (err) => {
-  console.log(err);
-});
+var jsonRes   = require('../json-res');
+var oRedis    = require('../bd/redis');
+var oLugares  = require('./lugares');
 
 /**
  * Componente principal
  */
-var temperatura = {
+var oTemperatura = {
 
   servicio: {
     url     : 'https://api.darksky.net/forecast/44024b1ca03ddb6445f9b5aba9f885ce',
@@ -36,77 +27,79 @@ var temperatura = {
   },
 
   // Estado de la obtención de temeperaturas
-  estado : null,
-  error  : null,
+  estadoConsumoServicio : null,
+  errorConsumoServicio  : null,
 
-  // Listado de temperaturas obtenidas
-  places : [
-    { nombre: 'Santiago', abreviado: 'CL',  clima: null, latLon: '-33.4372,-70.6506' },
-    { nombre: 'Zurich',   abreviado: 'CH',  clima: null, latLon: '47.3666687,8.5500002' },
-    { nombre: 'Auckland', abreviado: 'NZ',  clima: null, latLon: '-36.8404,174.7634888' },
-    { nombre: 'Sydney',   abreviado: 'AU',  clima: null, latLon: '-33.8667,151.2' },
-    { nombre: 'Londres',  abreviado: 'UK',  clima: null, latLon: '51.5072,-0.1275' },
-    { nombre: 'Georgia',  abreviado: 'USA', clima: null, latLon: '41.8036499,43.4819412' }
-  ]
+  // Lugares a trabajar obtenidos desde Redis
+  estadoLugares : null,
+  errorLugares  : null,
+  lugares       : null
 
 };
+
+//
+// Rescate lugares desde Redis
+//
+oRedis.cliente.get( oLugares.redisKey, (error, result) => {
+    
+  oTemperatura.estadoLugares = null;
+
+  if (error) {
+    oTemperatura.estadoLugares  = false;
+    oTemperatura.errorLugares   = error;
+  }
+
+  oTemperatura.estadoLugares  = true;
+  oTemperatura.lugares = JSON.parse(result);
+
+});
 
 /**
  * Retorna la información de los lugares desde el servicio y lo almacena en Redis
  */
-temperatura.getDataFromService = () => {
+oTemperatura.getDataFromService = () => {
 
-  temperatura.estado = null; // Inicio del estado de control de la respuesta
-  temperatura.error  = null; // Reinicio del mensaje de error
+  // Fallo del 10%
+  if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
 
+  // Verificación de la obtención de los datos desde Redis
+  if (oTemperatura.estadoLugares === false ) { throw oTemperatura.errorLugares; }
+
+  // Reinicio de valores de validación
+  oTemperatura.estadoConsumoServicio = null;
+  oTemperatura.errorConsumoServicio  = null;
+
+  //
+  // Consumo del servicio con Axios
+  //
   axios.all([
 
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[0].latLon + '?' + temperatura.servicio.params),
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[1].latLon + '?' + temperatura.servicio.params),
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[2].latLon + '?' + temperatura.servicio.params),
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[3].latLon + '?' + temperatura.servicio.params),
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[4].latLon + '?' + temperatura.servicio.params),
-    axios.get(temperatura.servicio.url + '/' + temperatura.places[5].latLon + '?' + temperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[0].latLon + '?' + oTemperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[1].latLon + '?' + oTemperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[2].latLon + '?' + oTemperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[3].latLon + '?' + oTemperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[4].latLon + '?' + oTemperatura.servicio.params),
+    axios.get(oTemperatura.servicio.url + '/' + oTemperatura.lugares[5].latLon + '?' + oTemperatura.servicio.params),
 
   ]).then(axios.spread((resCl, resCh, resNz, resAu, resUk, resUsa) => {
 
-    temperatura.places[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary, icon: resCl.data.currently.icon };
-    temperatura.places[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary, icon: resCh.data.currently.icon  };
-    temperatura.places[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary, icon: resNz.data.currently.icon  };
-    temperatura.places[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary, icon: resAu.data.currently.icon  };
-    temperatura.places[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
-    temperatura.places[5].clima  = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
-  
-    // Guardado en Redis
-    redisClient.set('places', JSON.stringify(temperatura.places), redis.print);
+    oTemperatura.lugares[0].clima   = { temperatura: resCl.data.currently.temperature, estado: resCl.data.currently.summary, icon: resCl.data.currently.icon };
+    oTemperatura.lugares[1].clima   = { temperatura: resCh.data.currently.temperature, estado: resCh.data.currently.summary, icon: resCh.data.currently.icon  };
+    oTemperatura.lugares[2].clima   = { temperatura: resNz.data.currently.temperature, estado: resNz.data.currently.summary, icon: resNz.data.currently.icon  };
+    oTemperatura.lugares[3].clima   = { temperatura: resAu.data.currently.temperature, estado: resAu.data.currently.summary, icon: resAu.data.currently.icon  };
+    oTemperatura.lugares[4].clima   = { temperatura: resUk.data.currently.temperature, estado: resUk.data.currently.summary, icon: resUk.data.currently.icon  };
+    oTemperatura.lugares[5].clima   = { temperatura: resUsa.data.currently.temperature, estado: resUsa.data.currently.summary, icon: resUsa.data.currently.icon  };
 
     // Bandera de infromación capturada con éxito
-    temperatura.estado = true;
+    oTemperatura.estadoConsumoServicio = true;
 
-  })).catch(error => {
+  })).catch( error => {
 
-    console.error('temperatura.getTemperaturas', error);
-    temperatura.estado = false;
-    temperatura.error  = error;
+    oTemperatura.errorConsumoServicio  = error;
+    oTemperatura.estadoConsumoServicio = false;
     
   });
 
 }
 
-/**
- * Coordina el rescate de todas las temperaturas
- */
-temperatura.getDataFromRedis = () => {
-
-  redisClient.get('places', function (error, result) {
-    if (error) {
-      console.log(error);
-      return jsonRes.set(false, 'No se pudo obtener la data de Redis', error);
-    }
-    console.log('result', result);
-    return jsonRes.set(true, 'Data desde Redis', result);
-  });
-
-};
-
-module.exports = temperatura;
+module.exports = oTemperatura;

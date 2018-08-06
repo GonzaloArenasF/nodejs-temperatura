@@ -14,13 +14,14 @@ var bodyParser    = require('body-parser');
 var http          = require('http');
 var socketIO      = require('socket.io');
 
+var oRedis        = require('./src/bd/redis');
+var oLugares      = require('./src/componentes/lugares');
+
 // Inicializar variables
 var puertoServer        = 3000;
 var app                 = express();
 var server              = http.createServer(app);
 var io                  = socketIO(server);
-
-// var temperatura = require('./src/componentes/temperatura');
 
 //
 // Control CORS
@@ -37,11 +38,15 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: false }));  // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());                           // parse application/json
 
+//
 // Rutas
+//
 var routesPath = './src/routes';
 app.use('/', require(routesPath + '/app'));
 
+//
 // Sockets
+//
 /* io.on('connection', function(socket) {
 
   console.log('Una conexión estabecida', socket.id);
@@ -61,7 +66,17 @@ app.use('/', require(routesPath + '/app'));
 
 });*/
 
+//
 // Inicio de servidor
+//
 server.listen( puertoServer, () => {
   console.log('Express Server REST corriendo en puerto ' + puertoServer + ': online');
+});
+
+//
+// Inicialización de datos
+//
+oRedis.cliente.on('connect', () => {
+  console.log('Cliente Redis conectado a ' + oRedis.host + ':' + oRedis.port); 
+  oLugares.storeRedis();
 });
