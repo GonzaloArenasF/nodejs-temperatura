@@ -41,8 +41,9 @@ app.get( '/temperatura', (req, res, next) => {
 
       } else if (oTemperatura.estadoConsumoServicio === false) {
 
+        console.log('oTemperatura.errorConsumoServicio', oTemperatura.errorConsumoServicio);
         res.status(500).json(
-          jsonRes.get(false, 'No se pudo rescatar la data', oTemperatura.errorConsumoServicio)
+          jsonRes.get(false, oTemperatura.errorConsumoServicio)
         );
 
       }
