@@ -12,7 +12,6 @@
 //
 var axios   = require('axios');
 
-var jsonRes   = require('../json-res');
 var oRedis    = require('../bd/redis');
 var oLugares  = require('./lugares');
 
