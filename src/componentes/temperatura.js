@@ -108,6 +108,44 @@ oTemperatura.getDataFromService = () => {
       
   }
 
-}
+};
+
+/**
+ * Retorna la información de los lugares desde el servicio y lo almacena en Redis
+ */
+oTemperatura.getDataFromDummy = () => {
+
+  try {
+
+    // Fallo del 10%
+    if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
+
+    // Verificación de la obtención de los datos desde Redis
+    if (oTemperatura.estadoLugares === false ) { throw oTemperatura.errorLugares; }
+
+    // Reinicio de valores de validación
+    oTemperatura.estadoConsumoServicio = null;
+    oTemperatura.errorConsumoServicio  = null;
+
+    //
+    // Dummy
+    //
+    oTemperatura.lugares[0].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Despejado', icon: 'clear-day' };
+    oTemperatura.lugares[1].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Nublado', icon: 'cloudy'  };
+    oTemperatura.lugares[2].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Nubosidad Parcial', icon: 'partly-cloudy-day'  };
+    oTemperatura.lugares[3].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Lluvia', icon: 'rain'  };
+    oTemperatura.lugares[4].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2), estado: 'Ventisca', icon: 'wind'  };
+    oTemperatura.lugares[5].clima   = { temperatura: (Math.random(0, 1)*1000).toString().substring(0,2) , estado: 'Tormenta', icon: 'thunderstorm'  };
+
+    oTemperatura.estadoConsumoServicio = true;
+
+  } catch (e) {
+
+    oTemperatura.errorConsumoServicio  = e;
+    oTemperatura.estadoConsumoServicio = false;
+
+  }
+
+};
 
 module.exports = oTemperatura;

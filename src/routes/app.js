@@ -25,7 +25,8 @@ var app = express();
 //
 app.get( '/temperatura', (req, res, next) => {
 
-  oTemperatura.getDataFromService();
+  // oTemperatura.getDataFromService();
+  oTemperatura.getDataFromDummy();
 
   let si = setInterval( () => {
 
