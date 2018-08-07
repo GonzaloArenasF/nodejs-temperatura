@@ -16,7 +16,7 @@ var jsonRes = {};
  * @param {string} msg 
  * @param {object} det 
  */
-jsonRes.set = (est, msg, det = null) => {
+jsonRes.get = (est, msg, det = null) => {
 
   if (typeof(est) !== 'boolean') { return false };
   if (typeof(msg) !== 'string') { return false };

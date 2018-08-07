@@ -8,22 +8,27 @@
  */
 
 // Requires
-var express     = require('express');
-var bodyParser  = require('body-parser');
+var express       = require('express');
+var cors          = require('cors')
+var bodyParser    = require('body-parser');
+var http          = require('http');
+
+var oRedis        = require('./src/bd/redis');
+var oLugares      = require('./src/componentes/lugares');
 
 // Inicializar variables
-var puertoExpress = 3000; //Puede ser cualquier puerto disponible 
-var app           = express();
+var puertoServer        = 3000;
+var app                 = express();
+var server              = http.createServer(app);
 
 //
 // Control CORS
 //
-app.use( function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow.Methos", "PSOT, GET, PUT, DELETE, OPTIONS");
-  next();
-});
+app.use(cors({
+  methods     : 'GET',
+  origin      : 'http://localhost:3001',
+  credentials : true
+}));
 
 //
 // Body Parser
@@ -31,11 +36,29 @@ app.use( function(req, res, next) {
 app.use(bodyParser.urlencoded({ extended: false }));  // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());                           // parse application/json
 
+//
 // Rutas
+//
 var routesPath = './src/routes';
-app.use('/', require(routesPath + '/app'));
+app.use('/', require(routesPath + '/lugares'));
 
-// Escuchar peticiones
-app.listen( puertoExpress, () => {
-  console.log('Express Server corriendo en puerto ' + puertoExpress + ': online');
+//
+// Sockets
+//
+var socketsPath = './src/sockets';
+require(socketsPath + '/lugares')(server);
+
+//
+// Inicio de servidor
+//
+server.listen( puertoServer, () => {
+  console.log('Express Server REST corriendo en puerto ' + puertoServer + ': online');
+});
+
+//
+// Inicialización de datos
+//
+oRedis.cliente.on('connect', () => {
+  console.log('Cliente Redis conectado a ' + oRedis.host + ':' + oRedis.port); 
+  oLugares.storeRedis();
 });
