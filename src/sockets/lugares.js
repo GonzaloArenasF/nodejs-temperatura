@@ -25,8 +25,8 @@
 
     socket.on('placesReq', req => {
 
-      // oTemperatura.getDataFromService();
-      oTemperatura.getDataFromDummy();
+      oTemperatura.getDataFromService();
+      // oTemperatura.getDataFromDummy();
 
       let si = setInterval( () => {
 
