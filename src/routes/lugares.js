@@ -14,9 +14,14 @@
  * - Refactoring
  * 
  */
+
+//
+// Imports
+//
 var express = require('express');
-var jsonRes = require('../json-res');
-var oTemperatura = require('../componentes/temperatura');
+
+var jsonRes      = require('../json-res');
+var oTemperatura = new (require('../componentes/temperatura'))();
 
 var app = express();
 
