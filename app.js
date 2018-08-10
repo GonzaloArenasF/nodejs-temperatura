@@ -26,7 +26,7 @@ var server              = http.createServer(app);
 //
 app.use(cors({
   methods     : 'GET',
-  origin      : ['http://localhost:3001', 'http://168.232.167.112:3001', 'https://reactjs-temperatura.herokuapp.com'],
+  origin      : '*',
   credentials : true
 }));
 
