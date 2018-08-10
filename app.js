@@ -28,7 +28,7 @@ var io                  = socketIO(server);
 //
 app.use(cors({
   methods     : 'GET',
-  origin      : 'http://localhost:3001',
+  origin      : 'http://localhost:3001, https://reactjs-temperatura-frontend.herokuapp.com',
   credentials : true
 }));
 
