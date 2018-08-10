@@ -17,7 +17,7 @@ var oRedis        = require('./src/bd/redis');
 var oLugares      = require('./src/componentes/lugares');
 
 // Inicializar variables
-var puertoServer        = 493; //3000
+var puertoServer        = 443; //3000
 var app                 = express();
 var server              = http.createServer(app);
 
@@ -26,7 +26,7 @@ var server              = http.createServer(app);
 //
 app.use(cors({
   methods     : 'GET',
-  origin      : 'http://localhost:3001, http://168.232.167.112:3001, https://reactjs-temperatura-frontend.herokuapp.com',
+  origin      : 'http://localhost:3001, http://168.232.167.112:3001, https://reactjs-temperatura.herokuapp.com',
   credentials : true
 }));
 
