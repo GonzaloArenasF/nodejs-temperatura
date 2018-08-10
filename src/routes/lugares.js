@@ -14,9 +14,14 @@
  * - Refactoring
  * 
  */
+
+//
+// Imports
+//
 var express = require('express');
-var jsonRes = require('../json-res');
-var oTemperatura = require('../componentes/temperatura');
+
+var jsonRes      = require('../json-res');
+var oTemperatura = new (require('../componentes/temperatura'))();
 
 var app = express();
 
@@ -42,6 +47,7 @@ app.get( '/temperatura', (req, res, next) => {
 
       } else if (oTemperatura.estadoConsumoServicio === false) {
 
+        console.log('oTemperatura.errorConsumoServicio', oTemperatura.errorConsumoServicio);
         res.status(500).json(
           jsonRes.get(false, oTemperatura.errorConsumoServicio)
         );
