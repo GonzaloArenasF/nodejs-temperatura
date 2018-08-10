@@ -17,7 +17,7 @@ var oRedis        = require('./src/bd/redis');
 var oLugares      = require('./src/componentes/lugares');
 
 // Inicializar variables
-var puertoServer        = 3000;
+var puertoServer        = 80; //3000
 var app                 = express();
 var server              = http.createServer(app);
 
