@@ -21,7 +21,8 @@ var oLugares  = require('./lugares');
 function oTemperatura () {
 
   this.servicio = {
-    url     : 'https://api.darksky.net/forecast/44024b1ca03ddb6445f9b5aba9f885ce',
+    urlPersonal     : 'https://api.darksky.net/forecast/44024b1ca03ddb6445f9b5aba9f885ce',
+    url     : 'https://api.darksky.net/forecast/2b58d388684fbfae750a4f2f86ac287c',
     params  : 'lang=es&units=auto'
   },
 
@@ -59,7 +60,7 @@ function oTemperatura () {
     try {
 
       // Fallo del 10%
-      if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
+      // if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
 
       // Verificación de la obtención de los datos desde Redis
       if (this.estadoLugares === false ) { throw this.errorLugares; }
@@ -116,7 +117,7 @@ function oTemperatura () {
     try {
 
       // Fallo del 10%
-      if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
+      // if (Math.random(0, 1) < 0.1) { throw 'How unfortunate! The API Request Failed'; }
 
       // Verificación de la obtención de los datos desde Redis
       if (this.estadoLugares === false ) { throw this.errorLugares; }
