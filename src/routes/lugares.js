@@ -47,7 +47,35 @@ app.get( '/temperatura', (req, res, next) => {
 
       } else if (oTemperatura.estadoConsumoServicio === false) {
 
-        console.log('oTemperatura.errorConsumoServicio', oTemperatura.errorConsumoServicio);
+        res.status(500).json(
+          jsonRes.get(false, oTemperatura.errorConsumoServicio)
+        );
+
+      }
+
+    }
+
+  }, 500 );
+
+});
+
+app.get ( '/city-weather/:coordenadas', (req, res, next) => {
+
+  oTemperatura.getWeatherFromCoord(req.params.coordenadas);
+  let si = setInterval( () => {
+
+    if (oTemperatura.estadoConsumoServicio !== null) {
+
+      clearInterval(si);
+
+      if (oTemperatura.estadoConsumoServicio === true) {
+
+        res.status(200).json(
+          jsonRes.get(true, 'Lugar rescatado', oTemperatura.place)
+        );
+
+      } else if (oTemperatura.estadoConsumoServicio === false) {
+
         res.status(500).json(
           jsonRes.get(false, oTemperatura.errorConsumoServicio)
         );

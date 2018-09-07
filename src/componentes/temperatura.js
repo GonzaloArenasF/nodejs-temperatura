@@ -35,6 +35,9 @@ function oTemperatura () {
   this.errorLugares  = null;
   this.lugares       = null;
 
+  // Cuando se recupera un lugar específico
+  this.place = null;
+
   //
   // Rescate lugares desde Redis
   //
@@ -146,6 +149,47 @@ function oTemperatura () {
     }
 
   };
+
+  /**
+   * Rescate de los datos actuales del clima de una localidad por coordendas
+   */
+  this.getWeatherFromCoord = (coordendas) => {
+
+    try {
+
+      // Reinicio de valores de validación
+      this.estadoConsumoServicio = null;
+      this.errorConsumoServicio  = null;
+
+      //
+      // Consumo del servicio con Axios
+      //
+      axios.all([
+
+        axios.get(this.servicio.url + '/' + coordendas + '?' + this.servicio.params)
+
+      ]).then(axios.spread( (res) => {
+
+        this.place = res.data.currently;
+
+        // Bandera de infromación capturada con éxito
+        this.estadoConsumoServicio = true;
+
+      })).catch( error => {
+
+        this.errorConsumoServicio  = error;
+        this.estadoConsumoServicio = false;
+        
+      });
+
+    } catch (e) {
+
+      this.errorConsumoServicio  = e;
+      this.estadoConsumoServicio = false;
+        
+    }
+
+  }
 
   return this;
 
